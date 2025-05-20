@@ -84,6 +84,8 @@ A3 — Problème technique (ex. base de données indisponible) :
     Le système affiche un message d’erreur : « Une erreur est survenue, veuillez réessayer »
 
     L’utilisateur peut réessayer ou annuler (retour au flux A1)
+    
+A4 - Pas Assez de stagiaire pour la formation : La formation ne démarre pas
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
