@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Périodes en entreprise{% endblock %}
+
+{% block body %}
+<h1>Périodes en entreprise</h1>
+
+<a href="{{ path('periode_entreprise_new') }}" class="btn btn-primary">Ajouter</a>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Formation</th>
+            <th>Date début</th>
+            <th>Date fin</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for periode in periodes %}
+        <tr>
+            <td>{{ periode.formation.nom }}</td>
+            <td>{{ periode.dateDebut|date('d/m/Y') }}</td>
+            <td>{{ periode.dateFin|date('d/m/Y') }}</td>
+            <td>
+                <a href="{{ path('periode_entreprise_edit', { id: periode.id }) }}" class="btn btn-sm btn-warning">Modifier</a>
+                <form method="post" action="{{ path('periode_entreprise_delete', { id: periode.id }) }}" style="display:inline-block;" onsubmit="return confirm('Supprimer cette période ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ periode.id) }}">
+                    <button class="btn btn-sm btn-danger">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="4">Aucune période définie.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

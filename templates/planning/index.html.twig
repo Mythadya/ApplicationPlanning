@@ -1,20 +1,38 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Hello PlanningController!{% endblock %}
-
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/benjamin/Documents/CDA/ProjetStage/ApplicationPlanning/src/Controller/PlanningController.php</code></li>
-        <li>Your template at <code>/home/benjamin/Documents/CDA/ProjetStage/ApplicationPlanning/templates/planning/index.html.twig</code></li>
-    </ul>
-</div>
-{% endblock %}
+<table border="1" cellpadding="10">
+    <thead>
+        <tr>
+            <th>Semaine (ISO)</th>
+            <th>Formations</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for semaine in semaines %}
+        <tr>
+            <td>
+                Semaine {{ semaine.week }} - {{ semaine.year }}<br>
+                {{ semaine.start|date('d/m/Y') }} → {{ semaine.end|date('d/m/Y') }}<br>
+                {# Jours fériés dans la semaine #}
+                {% for i in 0..6 %}
+                    {% set jour = semaine.start|date_modify('+' ~ i ~ ' days') %}
+                    {% if jour|date('Y-m-d') in joursFeries %}
+                        <div style="color:red;">{{ jour|date('D d/m') }} férié</div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for formation in formations %}
+                    {# Vérifier si la formation chevauche cette semaine #}
+                    {% if formation.dateDebut <= semaine.end and formation.dateFin >= semaine.start %}
+                        <div style="margin-bottom: 10px;">
+                            <strong>{{ formation.nom }}</strong><br>
+                            {{ formation.dateDebut|date('d/m/Y') }} - {{ formation.dateFin|date('d/m/Y') }}<br>
+                            Stagiaires : {{ formation.nbStagiairesPrevision ?? 'N/A' }}<br>
+                            {# Tu peux ajouter les périodes de stage etc ici #}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Inscription</h1>
+
+        {{ form_start(form) }}
+            {{ form_row(form.motDePasse.first) }}
+            {{ form_row(form.motDePasse.second) }}
+
+            <button class="btn btn-success">Valider l'inscription</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

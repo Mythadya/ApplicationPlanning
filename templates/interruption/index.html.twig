@@ -1,20 +1,44 @@
+{# templates/interruption/index.html.twig #}
+
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello InterruptionController!{% endblock %}
+{% block title %}Liste des interruptions{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<h1>Liste des interruptions</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Formation</th>
+            <th>Date début</th>
+            <th>Date fin</th>
+            <th>Motif</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for interruption in interruptions %}
+            <tr>
+                <td>{{ interruption.formation.nom }}</td>
+                <td>{{ interruption.dateDebut ? interruption.dateDebut|date('d/m/Y') : '' }}</td>
+                <td>{{ interruption.dateFin ? interruption.dateFin|date('d/m/Y') : '' }}</td>
+                <td>{{ interruption.motif }}</td>
+                <td>
+                    <a href="{{ path('interruption_edit', {'id': interruption.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/benjamin/Documents/CDA/ProjetStage/ApplicationPlanning/src/Controller/InterruptionController.php</code></li>
-        <li>Your template at <code>/home/benjamin/Documents/CDA/ProjetStage/ApplicationPlanning/templates/interruption/index.html.twig</code></li>
-    </ul>
-</div>
+                    <form method="post" action="{{ path('interruption_delete', {'id': interruption.id}) }}" style="display:inline-block" onsubmit="return confirm('Voulez-vous vraiment supprimer cette interruption ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ interruption.id) }}">
+                        <button class="btn btn-danger btn-sm">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">Aucune interruption trouvée.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ path('interruption_new') }}" class="btn btn-success mt-3">Nouvelle interruption</a>
+
 {% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inviter un utilisateur{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Inviter un utilisateur</h1>
+
+        {{ form_start(form) }}
+            {{ form_row(form.nom) }}
+            {{ form_row(form.prenom) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.role) }}
+
+            <button class="btn btn-primary">Envoyer l'invitation</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
