@@ -1,6 +1,5 @@
 # ApplicationPlanning
 
-
 ## 🧱 Travail restant
 
 ### 🔐 **Rôles et sécurité**
@@ -42,16 +41,6 @@
 * Système d’authentification complet (en cours ou à ajouter si non fait)
 * Fixtures de test avec 3 utilisateurs (1 par rôle)
 
-### 🧪 **Librairie de gestion de dates (`DateHelper`)**
-
-* Déjà entamée, mais à compléter/tester :
-  * ✅ Obtenir le numéro de semaine ISO
-  * ✅ Premier jour de la semaine
-  * ✅ Premier jour du mois
-  * ❌ Prochain jour travaillé
-  * ❌ Liste des mois entre deux dates
-  * ❌ Liste des semaines entre deux dates
-
 ### ✅ Tests / Déploiement
 
 * Fixtures de test
@@ -65,8 +54,6 @@
 | Admin        | [admin@test.com]()      | admin123     | Toutes les fonctionnalités  |
 | Gestionnaire | [gestion@test.com]()    | gestion123   | Gestion planning, formations |
 | Consultant   | [consultant@test.com]() | consult123   | Lecture seule                |
-
-
 
 ## ✅ Fonctionnalités déjà implémentées
 
@@ -89,3 +76,13 @@
 * Formulaire pour périodes en entreprise
 * Formulaire pour jours fériés
 * Formulaire profil utilisateur
+
+### 🧪 **Librairie de gestion de dates (`DateHelper`)**
+
+* Déjà entamée, mais à compléter/tester :
+  * ✅ Obtenir le numéro de semaine ISO
+  * ✅ Premier jour de la semaine
+  * ✅ Premier jour du mois
+  * ✅ Prochain jour travaillé
+  * ✅ Liste des mois entre deux dates
+  * ✅ Liste des semaines entre deux dates

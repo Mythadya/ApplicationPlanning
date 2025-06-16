@@ -1,3 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Planning{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://unpkg.com/frappe-gantt/dist/frappe-gantt.css">
+    <style>
+        .bar-formation {
+            fill: #3b82f6 !important;
+        }
+        .bar-stage {
+            fill: #16a34a !important;
+        }
+        #view-selector {
+            margin: 20px 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<h1>Planning des Formations</h1>
+
+<label for="view-selector">Vue :</label>
+<select id="view-selector">
+    <option value="Day">Jour</option>
+    <option value="Week" selected>Semaine</option>
+    <option value="Month">Mois</option>
+</select>
+
+<div id="gantt" style="margin-bottom: 50px;"></div>
+
 <table border="1" cellpadding="10">
     <thead>
         <tr>
@@ -11,7 +43,6 @@
             <td>
                 Semaine {{ semaine.week }} - {{ semaine.year }}<br>
                 {{ semaine.start|date('d/m/Y') }} → {{ semaine.end|date('d/m/Y') }}<br>
-                {# Jours fériés dans la semaine #}
                 {% for i in 0..6 %}
                     {% set jour = semaine.start|date_modify('+' ~ i ~ ' days') %}
                     {% if jour|date('Y-m-d') in joursFeries %}
@@ -21,13 +52,14 @@
             </td>
             <td>
                 {% for formation in formations %}
-                    {# Vérifier si la formation chevauche cette semaine #}
                     {% if formation.dateDebut <= semaine.end and formation.dateFin >= semaine.start %}
                         <div style="margin-bottom: 10px;">
                             <strong>{{ formation.nom }}</strong><br>
                             {{ formation.dateDebut|date('d/m/Y') }} - {{ formation.dateFin|date('d/m/Y') }}<br>
                             Stagiaires : {{ formation.nbStagiairesPrevision ?? 'N/A' }}<br>
-                            {# Tu peux ajouter les périodes de stage etc ici #}
+                            {% for periode in formation.periodesEntreprise %}
+                                📅 Stage : {{ periode.dateDebut|date('d/m') }} → {{ periode.dateFin|date('d/m') }}<br>
+                            {% endfor %}
                         </div>
                     {% endif %}
                 {% endfor %}
@@ -36,3 +68,46 @@
     {% endfor %}
     </tbody>
 </table>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://unpkg.com/frappe-gantt/dist/frappe-gantt.min.js"></script>
+    <script>
+        const tasks = [
+            {% for formation in formations %}
+            {
+                id: 'formation-{{ formation.id }}',
+                name: '{{ formation.nom|e('js') }}',
+                start: '{{ formation.dateDebut.format('Y-m-d') }}',
+                end: '{{ formation.dateFin.format('Y-m-d') }}',
+                progress: 0,
+                custom_class: 'bar-formation'
+            },
+            {% for periode in formation.periodesEntreprise %}
+            {
+                id: 'stage-{{ periode.id }}',
+                name: 'Stage - {{ formation.nom|e('js') }}',
+                start: '{{ periode.dateDebut.format('Y-m-d') }}',
+                end: '{{ periode.dateFin.format('Y-m-d') }}',
+                progress: 0,
+                custom_class: 'bar-stage'
+            },
+            {% endfor %}
+            {% endfor %}
+        ];
+
+        const gantt = new Gantt("#gantt", tasks, {
+            view_mode: 'Week',
+            language: 'fr',
+            date_format: 'YYYY-MM-DD',
+            on_click: function(task) {
+                alert("Détail : " + task.name + "\nDu " + task.start + " au " + task.end);
+            }
+        });
+
+        document.getElementById('view-selector').addEventListener('change', function () {
+            gantt.change_view_mode(this.value);
+        });
+    </script>
+{% endblock %}

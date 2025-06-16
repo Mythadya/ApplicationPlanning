@@ -33,16 +33,17 @@ class DateHelper
     }
 
     /**
-     * Retourne le prochain jour travaillé à partir d'une date donnée (exclut samedi, dimanche, et jours fériés)
-     * $joursFeries est un tableau de dates (string 'Y-m-d') ou \DateTimeInterface
+     * Retourne le prochain jour travaillé (hors samedi, dimanche et jours fériés)
      */
     public static function getNextWorkingDay(\DateTimeInterface $date, array $joursFeries = []): \DateTime
     {
         $dateClone = clone $date;
+
         do {
             $dateClone->modify('+1 day');
-            $dayOfWeek = (int)$dateClone->format('N'); // 1 = lundi ... 7 = dimanche
-            $isWeekend = ($dayOfWeek >= 6);
+            $dayOfWeek = (int)$dateClone->format('N'); // 6 = samedi, 7 = dimanche
+            $isWeekend = $dayOfWeek >= 6;
+
             $isJourFerie = false;
             foreach ($joursFeries as $jf) {
                 $jfDate = $jf instanceof \DateTimeInterface ? $jf->format('Y-m-d') : $jf;
@@ -57,49 +58,44 @@ class DateHelper
     }
 
     /**
-     * Retourne la liste des mois entre deux dates données (inclus), sous forme de chaînes 'Y-m' (ex: 2025-06)
+     * Retourne la liste des mois entre deux dates, au format 'Y-m' (ex: 2025-06)
      */
     public static function getMonthsBetween(\DateTimeInterface $start, \DateTimeInterface $end): array
     {
         $months = [];
-        $period = new \DatePeriod(
-            self::getFirstDayOfMonth($start),
-            new \DateInterval('P1M'),
-            (new \DateTimeImmutable($end->format('Y-m-01')))->modify('+1 month')
-        );
+        $current = new \DateTimeImmutable($start->format('Y-m-01'));
+        $end = new \DateTimeImmutable($end->format('Y-m-01'));
 
-        foreach ($period as $dt) {
-            $months[] = $dt->format('Y-m');
+        while ($current <= $end) {
+            $months[] = $current->format('Y-m');
+            $current = $current->modify('+1 month');
         }
 
         return $months;
     }
 
     /**
-     * Retourne la liste des semaines ISO entre deux dates données (inclus),
-     * sous forme de tableau ['year' => xxxx, 'week' => xx, 'start' => DateTime, 'end' => DateTime]
+     * Retourne la liste des semaines ISO entre deux dates, avec début et fin de chaque semaine
      */
     public static function getWeeksBetween(\DateTimeInterface $start, \DateTimeInterface $end): array
     {
         $weeks = [];
 
-        $startMonday = self::getFirstDayOfWeek($start);
+        $current = self::getFirstDayOfWeek($start);
         $endMonday = self::getFirstDayOfWeek($end);
 
-        $period = new \DatePeriod(
-            $startMonday,
-            new \DateInterval('P7D'),
-            $endMonday->modify('+7 days')
-        );
+        while ($current <= $endMonday) {
+            $weekStart = clone $current;
+            $weekEnd = (clone $current)->modify('+6 days');
 
-        foreach ($period as $weekStart) {
-            $weekEnd = (clone $weekStart)->modify('+6 days');
             $weeks[] = [
-                'year' => (int)$weekStart->format('o'),   // année ISO
-                'week' => (int)$weekStart->format('W'),   // numéro semaine ISO
+                'year' => (int)$weekStart->format('o'), // année ISO
+                'week' => (int)$weekStart->format('W'), // semaine ISO
                 'start' => $weekStart,
                 'end' => $weekEnd,
             ];
+
+            $current = $current->modify('+7 days');
         }
 
         return $weeks;
